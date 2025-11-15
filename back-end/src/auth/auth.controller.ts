@@ -11,16 +11,19 @@ import type { Response, Request } from 'express';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
   private get cookieOptions() {
-    const isProd = process.env.NODE_ENV === 'production';
+    const isProd =
+      process.env.RENDER === 'true' ||
+      process.env.NODE_ENV === 'production';
+
     return {
       httpOnly: true,
-      secure: isProd,                    
+      secure: isProd,               
       sameSite: isProd ? 'none' : 'lax', 
-      path: '/',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',                    
+      maxAge: 7 * 24 * 60 * 60 * 1000, 
     } as const;
   }
 
@@ -32,7 +35,6 @@ export class AuthController {
     const { accessToken, refreshToken, user } =
       await this.authService.login(body.email, body.password);
 
-    // Set cookie refresh_token
     res.cookie('refresh_token', refreshToken, this.cookieOptions);
 
     return { accessToken, user };
@@ -55,7 +57,6 @@ export class AuthController {
       user,
     } = await this.authService.refreshTokens(refreshToken);
 
-    // Rotate cookie
     res.cookie('refresh_token', rotatedToken, this.cookieOptions);
 
     return { accessToken, user };
@@ -63,11 +64,14 @@ export class AuthController {
 
   @Post('logout')
   async logout(@Res({ passthrough: true }) res: Response) {
-    // xóa cookie khi logout
+    const isProd =
+      process.env.RENDER === 'true' ||
+      process.env.NODE_ENV === 'production';
+
     res.clearCookie('refresh_token', {
       path: '/',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      secure: process.env.NODE_ENV === 'production',
+      sameSite: isProd ? 'none' : 'lax',
+      secure: isProd,
     });
 
     return { success: true };
