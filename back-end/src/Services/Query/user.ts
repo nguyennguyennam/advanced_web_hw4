@@ -2,7 +2,7 @@ import { Injectable, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { User } from "../../Model/user"";
+import { User } from "../../Model/user";
 import { UserDto } from 'src/Dto/userDto';
 import { hashPassword, comparePassword } from './Hashing';
 
