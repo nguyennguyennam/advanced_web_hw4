@@ -18,7 +18,7 @@ import { AuthGuard } from '@nestjs/passport';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
@@ -47,8 +47,13 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'))
   @Get('me')
   async getMe(@Req() req: Request) {
-    const userId = (req.user as any).userId;
-    const user = await this.userService.findById(userId); // cần method này trong UserService
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      throw new UnauthorizedException('Invalid user');
+    }
+
+    const user = await this.userService.findById(userId);
 
     if (!user) {
       throw new UnauthorizedException('User not found');
@@ -60,4 +65,5 @@ export class UserController {
       role: user.role,
     };
   }
+
 }
