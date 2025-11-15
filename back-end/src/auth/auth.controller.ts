@@ -13,23 +13,27 @@ import type { Response, Request } from 'express';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  private get cookieOptions() {
+    const isProd = process.env.NODE_ENV === 'production';
+    return {
+      httpOnly: true,
+      secure: isProd,                    
+      sameSite: isProd ? 'none' : 'lax', 
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    } as const;
+  }
+
   @Post('login')
   async login(
     @Body() body: { email: string; password: string },
     @Res({ passthrough: true }) res: Response,
   ) {
-    const { accessToken, refreshToken, user } = await this.authService.login(
-      body.email,
-      body.password,
-    );
+    const { accessToken, refreshToken, user } =
+      await this.authService.login(body.email, body.password);
 
-    res.cookie('refresh_token', refreshToken, {
-      httpOnly: true,
-      secure: false,  
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    // Set cookie refresh_token
+    res.cookie('refresh_token', refreshToken, this.cookieOptions);
 
     return { accessToken, user };
   }
@@ -40,28 +44,32 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const refreshToken = req.cookies?.['refresh_token'];
+
     if (!refreshToken) {
       throw new UnauthorizedException('No refresh token');
     }
 
-    const { accessToken, refreshToken: newRefresh, user } =
-      await this.authService.refreshTokens(refreshToken);
+    const {
+      accessToken,
+      refreshToken: rotatedToken,
+      user,
+    } = await this.authService.refreshTokens(refreshToken);
 
-    // rotate cookie
-    res.cookie('refresh_token', newRefresh, {
-      httpOnly: true,
-      secure: false, // true for HTTPS
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    // Rotate cookie
+    res.cookie('refresh_token', rotatedToken, this.cookieOptions);
 
     return { accessToken, user };
   }
 
   @Post('logout')
   async logout(@Res({ passthrough: true }) res: Response) {
-    res.clearCookie('refresh_token', { path: '/' });
+    // xóa cookie khi logout
+    res.clearCookie('refresh_token', {
+      path: '/',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: process.env.NODE_ENV === 'production',
+    });
+
     return { success: true };
   }
 }
