@@ -8,12 +8,14 @@ import Home from "./pages/Home";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RoleRoute from "./components/RoleRoute";
 
-import { setupMultiTabSync } from "./auth/authStore";
+import { setupMultiTabSync, useAuthStore } from "./auth/authStore";
 
 export default function App() {
   useEffect(() => {
     setupMultiTabSync(); // <-- enable multi-tab sync
   }, []);
+
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   return (
     <>
@@ -23,10 +25,14 @@ export default function App() {
             MyApp
           </Link>
 
-          <div className="flex gap-4 text-sm">
-            <Link to="/login">Login</Link>
-            <Link to="/register">Register</Link>
-          </div>
+          {!isAuthenticated && (
+            <div className="flex gap-4 text-sm">
+              <Link to="/login">Login</Link>
+              <Link to="/register">Register</Link>
+            </div>
+          )}
+
+          {}
         </div>
       </nav>
 
@@ -40,7 +46,7 @@ export default function App() {
           }
         />
 
-        {/* Admin Route*/}
+        {/* Admin Route */}
         <Route
           path="/admin"
           element={
@@ -49,7 +55,6 @@ export default function App() {
             </RoleRoute>
           }
         />
-
 
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Registration />} />

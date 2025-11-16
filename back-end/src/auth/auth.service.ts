@@ -40,7 +40,7 @@ export class AuthService {
     const user = await this.validateUser(email, password);
 
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('account not found');
     }
 
     const payload = { sub: user.id, email: user.email, role: user.role };
