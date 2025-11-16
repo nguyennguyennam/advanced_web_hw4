@@ -28,8 +28,7 @@ export const setupMultiTabSync = () => {
       window.location.href = "/login";
     }
     if (e.key === "access-update") {
-      // do nothing — FE sẽ dùng token ở memory
-      // axios auto attaches it
+
     }
   });
 };
@@ -53,7 +52,7 @@ function scheduleSilentRefresh(token) {
   const expiresAt = decoded.exp * 1000;
   const now = Date.now();
 
-  const refreshBefore = 30_000; // 30s trước khi hết hạn
+  const refreshBefore = 30_000; 
 
   const delay = Math.max(expiresAt - now - refreshBefore, 5000);
 

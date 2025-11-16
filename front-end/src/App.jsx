@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Routes, Route, Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Routes, Route, Link, useLocation } from "react-router-dom";
 
 import Login from "./pages/Login";
 import Registration from "./pages/Registration";
@@ -8,14 +8,25 @@ import Home from "./pages/Home";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RoleRoute from "./components/RoleRoute";
 
-import { setupMultiTabSync, useAuthStore } from "./auth/authStore";
+import { setupMultiTabSync } from "./auth/authStore";
 
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const location = useLocation();
+
   useEffect(() => {
     setupMultiTabSync(); // <-- enable multi-tab sync
   }, []);
 
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  useEffect(() => {
+    try {
+      const accessToken = localStorage.getItem("accessToken");
+      const user = localStorage.getItem("user");
+      setIsAuthenticated(!!accessToken || !!user);
+    } catch (e) {
+      setIsAuthenticated(false);
+    }
+  }, [location.pathname]);
 
   return (
     <>
@@ -31,8 +42,6 @@ export default function App() {
               <Link to="/register">Register</Link>
             </div>
           )}
-
-          {}
         </div>
       </nav>
 
