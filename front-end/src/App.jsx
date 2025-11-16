@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Routes, Route, Link, Navigate } from "react-router-dom";
+import { Routes, Route, Link } from "react-router-dom";
 
 import Login from "./pages/Login";
 import Registration from "./pages/Registration";
@@ -31,13 +31,8 @@ export default function App() {
       </nav>
 
       <Routes>
-
-        {/* ⭐ Redirect "/" → "/login" */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
-
-        {/* Home (User protected) */}
         <Route
-          path="/home"
+          path="/"
           element={
             <ProtectedRoute>
               <Home />
@@ -45,7 +40,7 @@ export default function App() {
           }
         />
 
-        {/* Admin Route */}
+        {/* Admin Route*/}
         <Route
           path="/admin"
           element={
@@ -55,11 +50,10 @@ export default function App() {
           }
         />
 
+
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Registration />} />
-
-        {/* Không tìm thấy route → đưa về login */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="/not-authorized" element={<div>Not authorized</div>} />
       </Routes>
     </>
   );
