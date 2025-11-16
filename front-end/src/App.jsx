@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link, Navigate } from "react-router-dom";
 
 import Login from "./pages/Login";
 import Registration from "./pages/Registration";
@@ -12,14 +12,15 @@ import { setupMultiTabSync } from "./auth/authStore";
 
 export default function App() {
   useEffect(() => {
-    setupMultiTabSync(); // <-- enable multi-tab sync
+    setupMultiTabSync(); 
   }, []);
 
   return (
     <>
       <nav className="w-full border-b bg-white">
         <div className="max-w-5xl mx-auto px-4 py-3 flex justify-between">
-          <Link to="/" className="font-semibold text-lg">
+          {/* Có thể cho về /home thay vì / */}
+          <Link to="/home" className="font-semibold text-lg">
             MyApp
           </Link>
 
@@ -31,8 +32,10 @@ export default function App() {
       </nav>
 
       <Routes>
+        <Route path="/" element={<Navigate to="/login" replace />} />
+
         <Route
-          path="/"
+          path="/home"
           element={
             <ProtectedRoute>
               <Home />
@@ -40,7 +43,7 @@ export default function App() {
           }
         />
 
-        {/* Admin Route*/}
+        {/* Admin Route */}
         <Route
           path="/admin"
           element={
@@ -50,10 +53,11 @@ export default function App() {
           }
         />
 
-
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Registration />} />
         <Route path="/not-authorized" element={<div>Not authorized</div>} />
+
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </>
   );
