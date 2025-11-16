@@ -5,7 +5,7 @@ export default function ProtectedRoute({ children }) {
   const { data, isError, isLoading } = useUser();
 
   if (isLoading) return <div>Loading...</div>;
-  if (isError) return <Navigate to="/login" replace />;
+  if (isError || !data ) return <Navigate to="/login" replace />;
 
   return children;
 }
