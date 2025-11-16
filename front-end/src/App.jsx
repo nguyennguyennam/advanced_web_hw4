@@ -46,6 +46,9 @@ export default function App() {
       </nav>
 
       <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Registration />} />
+
         <Route
           path="/"
           element={
@@ -55,7 +58,6 @@ export default function App() {
           }
         />
 
-        {/* Admin Route */}
         <Route
           path="/admin"
           element={
@@ -65,10 +67,9 @@ export default function App() {
           }
         />
 
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Registration />} />
         <Route path="/not-authorized" element={<div>Not authorized</div>} />
       </Routes>
+
     </>
   );
 }

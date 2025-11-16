@@ -1,7 +1,11 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useUser } from "../auth/useAuth";
 
 export default function ProtectedRoute({ children }) {
+  const location = useLocation();
+
+  if (location.pathname === "/login") return children;
+
   const accessToken = localStorage.getItem("accessToken");
   const userCached = localStorage.getItem("user");
 
