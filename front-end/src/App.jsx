@@ -12,15 +12,14 @@ import { setupMultiTabSync } from "./auth/authStore";
 
 export default function App() {
   useEffect(() => {
-    setupMultiTabSync(); 
+    setupMultiTabSync(); // <-- enable multi-tab sync
   }, []);
 
   return (
     <>
       <nav className="w-full border-b bg-white">
         <div className="max-w-5xl mx-auto px-4 py-3 flex justify-between">
-          {/* Có thể cho về /home thay vì / */}
-          <Link to="/home" className="font-semibold text-lg">
+          <Link to="/" className="font-semibold text-lg">
             MyApp
           </Link>
 
@@ -32,8 +31,11 @@ export default function App() {
       </nav>
 
       <Routes>
+
+        {/* ⭐ Redirect "/" → "/login" */}
         <Route path="/" element={<Navigate to="/login" replace />} />
 
+        {/* Home (User protected) */}
         <Route
           path="/home"
           element={
@@ -55,8 +57,8 @@ export default function App() {
 
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Registration />} />
-        <Route path="/not-authorized" element={<div>Not authorized</div>} />
 
+        {/* Không tìm thấy route → đưa về login */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </>
